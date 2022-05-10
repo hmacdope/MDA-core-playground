@@ -29,4 +29,18 @@ tstep_tric_f.DebugPrint();
       mdacore::Timestep<float, mdacore::TriclinicDimensions<double>>(10,
                                                                       d_boxmat_tric);
 tstep_tric_d.DebugPrint();
+
+
+
+ std::vector<float> pos_data;
+
+for(int i=0; i<3*10; i++){
+  pos_data.push_back(i);
+}
+
+ tstep_ortho_f.SetPositions(pos_data);
+
+ tstep_ortho_f.DebugPrint();
+
+
 }

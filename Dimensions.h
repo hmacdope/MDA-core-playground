@@ -3,14 +3,18 @@
 
 #include <cstddef>
 #include <cstdio>
+#include <algorithm>
+#include <array>
+
 
 namespace mdacore {
 
 template <typename T> class OrthogonalDimensions {
 public:
-  typedef T type;
+  // expose decl of type so can be used as Dimension::type
+  using type = T;
   static constexpr std::size_t size = 6;
-  T box[size];
+  std::array<T, size> box;
 
   OrthogonalDimensions(const T *src) {
     for (std::size_t i = 0; i < size; i++) {
@@ -28,9 +32,11 @@ public:
 
 template <typename T> class TriclinicDimensions {
 public:
-  typedef T type;
+  // expose decl of type so can be used as Dimension::type
+  using type = T;
+
   static constexpr std::size_t size = 9;
-  T box[size];
+  std::array<T, size> box;
 
   TriclinicDimensions(const T *src) {
     for (std::size_t i = 0; i < size; i++) {
