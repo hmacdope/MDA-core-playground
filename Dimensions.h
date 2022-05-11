@@ -1,11 +1,11 @@
 #ifndef MDA_DIMENSIONS_H_
 #define MDA_DIMENSIONS_H_
 
-#include <cstddef>
-#include <cstdio>
+#include "Util.h"
 #include <algorithm>
 #include <array>
-
+#include <cstddef>
+#include <cstdio>
 
 namespace mdacore {
 
@@ -16,18 +16,11 @@ public:
   static constexpr std::size_t size = 6;
   std::array<T, size> box;
 
-  OrthogonalDimensions(const T *src) {
-    for (std::size_t i = 0; i < size; i++) {
-      box[i] = src[i];
-    }
+  explicit OrthogonalDimensions(const std::vector<T> &source) {
+    std::copy(source.begin(), source.end(), std::begin(box));
   }
   // Dump state
-  void DebugPrint() {
-    std::printf("OrthogonalDimensions values\n");
-    for (std::size_t i = 0; i < size; i += 3) {
-      std::printf(" %f %f %f \n", box[i], box[i + 1], box[i + 2]);
-    }
-  }
+  void DebugPrint() { print_3col("OrthogonalDimensions", box); }
 };
 
 template <typename T> class TriclinicDimensions {
@@ -38,18 +31,11 @@ public:
   static constexpr std::size_t size = 9;
   std::array<T, size> box;
 
-  TriclinicDimensions(const T *src) {
-    for (std::size_t i = 0; i < size; i++) {
-      box[i] = src[i];
-    }
+  explicit TriclinicDimensions(const std::vector<T> &source) {
+    std::copy(source.begin(), source.end(), std::begin(box));
   }
   // Dump state
-  void DebugPrint() {
-    std::printf("TriclinicDimensions values\n");
-    for (std::size_t i = 0; i < size; i += 3) {
-      std::printf(" %f %f %f \n", box[i], box[i + 1], box[i + 2]);
-    }
-  }
+  void DebugPrint() { print_3col("TriclinicDimensions", box); }
 };
 
 template <typename T> class NoDimensions {

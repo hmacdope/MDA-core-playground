@@ -2,6 +2,7 @@
 #define MDA_TIMESTEP_H_
 
 #include "Dimensions.h"
+#include "Util.h"
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -21,7 +22,8 @@ public:
   std::vector<T> forces;
 
   // Constructor
-  Timestep(const std::uint64_t n_atoms, const typename DimensionsT::type *box)
+  Timestep(const std::uint64_t n_atoms,
+           const std::vector<typename DimensionsT::type> &box)
       : n_atoms(n_atoms), frame(-1), has_positions(false),
         has_velocities(false), has_forces(false), unitcell(box) {}
 
@@ -94,14 +96,6 @@ private:
   // note full copy interface, can this take ownership of a smart pointer
   void set_forces(const std::vector<T> &source) {
     std::copy(source.begin(), source.end(), std::back_inserter(forces));
-  }
-
-  void print_3col(const std::string &tag, const std::vector<T> &values) {
-    std::printf("%s: \n", tag.c_str());
-    for (std::size_t i = 0; i < values.size(); i+=3) {
-      std::printf(" %.3f %.3f %.3f \n", values[i], values[i + 1],
-                  values[i + 2]);
-    }
   }
 };
 
