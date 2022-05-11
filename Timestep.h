@@ -24,8 +24,8 @@ public:
   // Constructor
   Timestep(const std::uint64_t n_atoms,
            const std::vector<typename DimensionsT::type> &box)
-      : n_atoms(n_atoms), frame(-1), has_positions(false),
-        has_velocities(false), has_forces(false), unitcell(box) {}
+      : n_atoms(n_atoms), unitcell(box), frame(-1), has_positions(false),
+        has_velocities(false), has_forces(false) {}
 
   // copy constructor
 
