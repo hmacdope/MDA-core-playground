@@ -1,4 +1,5 @@
 # distutils: language = c++
+#cython: language_level=3
 
 from libcpp.vector cimport vector
 
@@ -8,8 +9,8 @@ cdef extern from "Dimensions.h" namespace "mdacore":
         OrthogonalDimensions()
         OrthogonalDimensions(const vector[T] &source) except +
 
-        
-        vector[T] box;
+        size_t    size
+        vector[T] box
 
     cdef cppclass TriclinicDimensions[T]:
         TriclinicDimensions()

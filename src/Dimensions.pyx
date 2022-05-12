@@ -1,8 +1,8 @@
 # distutils: language = c++
+#cython: language_level=3
 
 from _Dimensions cimport OrthogonalDimensions
 from libcpp.vector cimport vector
-from numpy_cleanup cimport set_base
 
 import numpy as np
 cimport numpy as cnp
@@ -10,9 +10,12 @@ cimport numpy as cnp
 
 cdef class OrthogonalDimensions_F:
     cdef OrthogonalDimensions[float] _OrthogonalDimensions
+    cdef size_t boxsize 
     
     def __cinit__(self, vector[float] vec ):
         self._OrthogonalDimensions = OrthogonalDimensions[float](vec)
+        self._boxsize = self._OrthogonalDimensions.size
+
 
     @property
     def box(self):
