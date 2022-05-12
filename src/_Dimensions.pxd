@@ -8,7 +8,12 @@ cdef extern from "Dimensions.h" namespace "mdacore":
         OrthogonalDimensions()
         OrthogonalDimensions(const vector[T] &source) except +
 
+        
+        vector[T] box;
+
     cdef cppclass TriclinicDimensions[T]:
         TriclinicDimensions()
         TriclinicDimensions(const vector[T] &source) except +
+
+        vector[T] box;
         

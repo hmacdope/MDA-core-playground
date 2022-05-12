@@ -14,10 +14,16 @@ public:
   // expose decl of type so can be used as Dimension::type
   using type = T;
   static constexpr std::size_t size = 6;
-  std::array<T, size> box;
+  std::vector<T> box;
 
-  explicit OrthogonalDimensions(const std::vector<T> &source) {
-    std::copy(source.begin(), source.end(), std::begin(box));
+  OrthogonalDimensions() { box.reserve(size); }
+
+  OrthogonalDimensions(const std::vector<T> &source) {
+    if (source.size() != size) {
+      throw std::runtime_error("Input not compatible with box of size 6");
+    }
+    box.reserve(size);
+    std::copy(source.begin(), source.end(), std::back_inserter(box));
   }
   // Dump state
   void DebugPrint() { print_3col("OrthogonalDimensions", box); }
@@ -29,11 +35,18 @@ public:
   using type = T;
 
   static constexpr std::size_t size = 9;
-  std::array<T, size> box;
+  std::vector<T> box;
+
+  TriclinicDimensions() { box.reserve(size); }
 
   explicit TriclinicDimensions(const std::vector<T> &source) {
-    std::copy(source.begin(), source.end(), std::begin(box));
+    if (source.size() != size) {
+      throw std::runtime_error("Input not compatible with box of size 9");
+    }
+    box.reserve(size);
+    std::copy(source.begin(), source.end(), std::back_inserter(box));
   }
+
   // Dump state
   void DebugPrint() { print_3col("TriclinicDimensions", box); }
 };
