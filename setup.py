@@ -10,8 +10,9 @@ def extensions():
     exts.append(
         Extension(
             'mdacore',
-            sources= ["./src/Dimensions.pyx"],
+            sources= ["./src/Dimensions.pyx", "./src/numpy_cleanup.pyx"],
             include_dirs=[ "./src/", np.get_include()],
+            compiler_directives={'language_level' : "3"},
             language="c++",
             extra_compile_args=["-std=c++11"],
             extra_link_args=["-std=c++11"]
