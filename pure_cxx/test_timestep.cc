@@ -1,6 +1,6 @@
 
-#include "Dimensions.h"
-#include "Timestep.h"
+#include "../src/Dimensions.h"
+#include "../src/Timestep.h"
 #include <numeric>
 
 int main() {
@@ -42,4 +42,10 @@ int main() {
   tstep_ortho_f.SetForces(data);
 
   tstep_ortho_f.DebugPrint();
+
+std::vector<float> f_boxmat2large = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+    auto tstep_ortho_f2 =  
+      mdacore::Timestep<float, mdacore::OrthogonalDimensions<float>>(10,
+                                                                     f_boxmat2large);
+  tstep_ortho_f2.DebugPrint();
 }

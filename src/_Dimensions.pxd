@@ -7,14 +7,14 @@ from libcpp.vector cimport vector
 cdef extern from "Dimensions.h" namespace "mdacore":
     cdef cppclass OrthogonalDimensions[T]:
         OrthogonalDimensions()
-        OrthogonalDimensions(const vector[T] &source) except +
+        OrthogonalDimensions(const vector[T] &source) except + ValueError
 
         size_t    size
         vector[T] box
 
     cdef cppclass TriclinicDimensions[T]:
         TriclinicDimensions()
-        TriclinicDimensions(const vector[T] &source) except +
+        TriclinicDimensions(const vector[T] &source) except + ValueError
 
         vector[T] box;
         

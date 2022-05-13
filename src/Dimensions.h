@@ -18,7 +18,7 @@ public:
 
   OrthogonalDimensions() { box.reserve(size); }
 
-  OrthogonalDimensions(const std::vector<T> &source) {
+  explicit OrthogonalDimensions(const std::vector<T> &source) {
     if (source.size() != size) {
       throw std::runtime_error("Input not compatible with box of size 6");
     }

@@ -85,7 +85,9 @@ private:
 
   // note full copy interface, can this take ownership of a smart pointer
   void set_positions(const std::vector<T> &source) {
-    std::copy(source.begin(), source.end(), std::back_inserter(positions));
+    // should we specify the number of elements in this and below rather than
+    //  relying on vector of correct size
+    std::copy(source.begin(), source.begin(), std::back_inserter(positions));
   }
 
   // note full copy interface, can this take ownership of a smart pointer

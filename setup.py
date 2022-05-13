@@ -15,7 +15,6 @@ def extensions():
             language="c++",
             extra_compile_args=["-std=c++11"],
             extra_link_args=["-std=c++11"],
-            define_macros=[('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')]
         ))
     return cythonize(exts, gdb_debug=False)
 

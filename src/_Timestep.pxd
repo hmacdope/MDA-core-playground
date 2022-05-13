@@ -3,7 +3,7 @@
 from libcpp.vector cimport vector
 
 cdef extern from "Timestep.h" namespace "mdacore":
-    cdef cppclass Timestep[T,U]:
+    cdef cppclass Timestep[T]:
         Timestep()
         void SetPositions(const vector[T] &pos) 
         void SetVelocities(const vector[T] &vel)

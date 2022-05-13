@@ -10,7 +10,7 @@ cimport numpy as cnp
 
 cdef class OrthogonalDimensions_F:
     cdef OrthogonalDimensions[float] _OrthogonalDimensions
-    cdef size_t boxsize 
+    cdef size_t _boxsize 
     
     def __cinit__(self, vector[float] vec ):
         self._OrthogonalDimensions = OrthogonalDimensions[float](vec)
@@ -25,7 +25,10 @@ cdef class OrthogonalDimensions_F:
         return box_ndarr
     
     @box.setter
-    def box(self, list newbox):
+    def box(self, cnp.ndarray[cnp.float32_t, ndim=1] newbox):
+        cdef size_t first_dim =  newbox.shape[0]
+        if first_dim != self._boxsize:
+            raise ValueError("box cannot be set with first dimension shape {}".format(first_dim))
         self._OrthogonalDimensions.box = newbox
 
 
