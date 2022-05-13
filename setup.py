@@ -10,7 +10,7 @@ def extensions():
     exts.append(
         Extension(
             'mdacore',
-            sources= ["./src/Dimensions.pyx"],
+            sources= ["./src/Timestep.pyx"],
             include_dirs=[ "./src/", np.get_include()],
             language="c++",
             extra_compile_args=["-std=c++11"],

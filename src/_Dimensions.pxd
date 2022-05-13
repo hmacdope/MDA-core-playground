@@ -10,11 +10,14 @@ cdef extern from "Dimensions.h" namespace "mdacore":
         OrthogonalDimensions(const vector[T] &source) except + ValueError
 
         size_t    size
+        ctypedef T type
         vector[T] box
 
     cdef cppclass TriclinicDimensions[T]:
         TriclinicDimensions()
         TriclinicDimensions(const vector[T] &source) except + ValueError
 
-        vector[T] box;
+        size_t    size
+        ctypedef T type
+        vector[T] box
         

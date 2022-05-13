@@ -21,6 +21,9 @@ public:
   std::vector<T> velocities;
   std::vector<T> forces;
 
+  using Btype = typename DimensionsT::type;
+
+
   // null constructable
   Timestep() {}
 

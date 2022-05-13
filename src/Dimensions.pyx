@@ -26,6 +26,8 @@ cdef class OrthogonalDimensions_F:
     
     @box.setter
     def box(self, cnp.ndarray[cnp.float32_t, ndim=1] newbox):
+        if newbox.ndim  >= 2:
+            raise ValueError("box cannot be set with multidimensional array")
         cdef size_t first_dim =  newbox.shape[0]
         if first_dim != self._boxsize:
             raise ValueError("box cannot be set with first dimension shape {}".format(first_dim))
