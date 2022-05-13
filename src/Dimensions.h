@@ -15,6 +15,7 @@ public:
   using type = T;
   std::vector<T> box;
   static constexpr std::size_t max_size = 9;
+  std::size_t size = 0;
 
 
   Dimensions() { box.reserve(max_size); }
@@ -25,6 +26,7 @@ public:
     }
     box.reserve(max_size);
     std::copy(source.begin(), source.end(), std::back_inserter(box));
+    size = box.size();
   }
   // Dump state
   void DebugPrint() { print_3col("Dimensions", box); }

@@ -24,11 +24,27 @@ cdef class Timestep_F_F:
 
     @property
     def positions(self):
-        cdef float[::1] posview = <float[:3*self.n_atoms]>self._Timestep.positions.data()
+        cdef float[:,::1] posview = <float[:self.n_atoms, :3]>self._Timestep.positions.data()
         cdef cnp.ndarray pos_ndarr = np.asarray(posview)
         return pos_ndarr
     
     @positions.setter
     def positions(self,  cnp.ndarray[cnp.float32_t, ndim=1] newpos):
-        self._Timestep.positions = newpos
+        self._Timestep.SetPositions(newpos)
+
+    @property
+    def dimensions(self):
+        cdef float[::1] boxview = <float[:self._Dimensions.size]>self._Dimensions.box.data()
+        cdef cnp.ndarray box_ndarr = np.asarray(boxview)
+        return box_ndarr
+    
+    @dimensions.setter
+    def dimensions(self, cnp.ndarray[cnp.float32_t, ndim=1] newbox):
+        if newbox.ndim  >= 2:
+            raise ValueError("box cannot be set with multidimensional array")
+        cdef size_t first_dim =  newbox.shape[0]
+        if first_dim > self._Dimensions.max_size:
+            raise ValueError("box cannot be set with first dimension shape {}".format(first_dim))
+        self._Dimensions.box = newbox
+
 

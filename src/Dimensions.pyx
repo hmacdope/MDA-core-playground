@@ -8,8 +8,8 @@ import numpy as np
 cimport numpy as cnp
 
 
-cdef class OrthogonalDimensions_F:
-    cdef OrthogonalDimensions[float] _OrthogonalDimensions
+cdef class Dimensions_F:
+    cdef Dimensions_F[float] _Dimensions_F
     cdef size_t _boxsize 
     
     def __cinit__(self, vector[float] vec ):
