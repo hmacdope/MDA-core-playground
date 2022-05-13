@@ -11,25 +11,22 @@
 
 namespace mdacore {
 
-template <typename T, class DimensionsT> class Timestep {
+template <typename T, typename BoxT> class Timestep {
 
 public:
   std::uint64_t n_atoms;
-  DimensionsT unitcell;
+  Dimensions<BoxT> unitcell;
 
   std::vector<T> positions;
   std::vector<T> velocities;
   std::vector<T> forces;
-
-  using Btype = typename DimensionsT::type;
-
 
   // null constructable
   Timestep() {}
 
   // Constructor
   Timestep(const std::uint64_t n_atoms,
-           const std::vector<typename DimensionsT::type> &box)
+           const std::vector<BoxT> &box)
       : n_atoms(n_atoms), unitcell(box), frame(-1), has_positions(false),
         has_velocities(false), has_forces(false) {}
 
@@ -93,7 +90,7 @@ private:
   void set_positions(const std::vector<T> &source) {
     // should we specify the number of elements in this and below rather than
     //  relying on vector of correct size
-    std::copy(source.begin(), source.begin(), std::back_inserter(positions));
+    std::copy(source.begin(), source.end(), std::back_inserter(positions));
   }
 
   // note full copy interface, can this take ownership of a smart pointer
