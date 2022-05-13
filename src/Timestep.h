@@ -14,12 +14,15 @@ namespace mdacore {
 template <typename T, class DimensionsT> class Timestep {
 
 public:
-  const std::uint64_t n_atoms;
+  std::uint64_t n_atoms;
   DimensionsT unitcell;
 
   std::vector<T> positions;
   std::vector<T> velocities;
   std::vector<T> forces;
+
+  // null constructable
+  Timestep() {}
 
   // Constructor
   Timestep(const std::uint64_t n_atoms,

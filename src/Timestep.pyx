@@ -2,23 +2,30 @@
 #cython: language_level=3
 
 from _Timestep cimport Timestep
-f
+from _Dimensions cimport OrthogonalDimensions
 
-cdef class Timesetep_F:
-    cdef Timestep[float] _OrthogonalDimensions
-    cdef size_t _boxsize 
-    
-    def __cinit__(self, vector[float] vec ):
-        self._OrthogonalDimensions = OrthogonalDimensions[float](vec)
-        self._boxsize = self._OrthogonalDimensions.size
+from libcpp.vector cimport vector
+from libc.stdint cimport uint64_t
 
+
+import numpy as np
+cimport numpy as cnp
+
+
+cdef class Timestep_F_F:
+    cdef Timestep[float, OrthogonalDimensions[float]] _Timestep
+    cdef uint64_t n_atoms
+
+    def __cinit__(self):
+        self._Timestep = Timestep[float, OrthogonalDimensions[float]]( )
+        self.n_atoms =  self._Timestep.n_atoms
 
     @property
-    def box(self):
-        cdef float[::1] boxview = <float[:6]>self._OrthogonalDimensions.box.data()
-        cdef cnp.ndarray box_ndarr = np.asarray(boxview)
-        return box_ndarr
+    def positions(self):
+        cdef float[::1] posview = <float[:100]>self._Timestep.positions.data()
+        cdef cnp.ndarray pos_ndarr = np.asarray(posview)
+        return pos_ndarr
     
-    @box.setter
-    def box(self, list newbox):
-        self._OrthogonalDimensions.box = newbox
+    @positions.setter
+    def positions(self,  cnp.ndarray[cnp.float32_t, ndim=1] newpos):
+        self._Timestep.positions = newpos
