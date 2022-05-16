@@ -21,14 +21,17 @@ public:
   std::vector<T> velocities;
   std::vector<T> forces;
 
-
   // Constructor
-  Timestep(const std::uint64_t n_atoms,
-           const std::vector<BoxT> &box)
-      : n_atoms(n_atoms), unitcell(box), frame(-1), has_positions(false),
-        has_velocities(false), has_forces(false) {}
+  explicit Timestep(const std::uint64_t n_atoms)
+      : n_atoms(n_atoms), unitcell(), frame(-1), has_dimensions(false),
+        has_positions(false), has_velocities(false), has_forces(false) {}
 
   // copy constructor
+
+  void SetDimensions(const std::vector<BoxT> &dimensions) {
+    set_dimensions(dimensions);
+    set_dimensions_flag(true);
+  }
 
   void SetPositions(const std::vector<T> &pos) {
     positions_reserve();
@@ -51,10 +54,13 @@ public:
   // Dump state to stdout
   void DebugPrint() {
     std::printf("natoms %lli\n", n_atoms);
+    std::printf("has dimensions %s\n", has_dimensions ? "true" : "false");
     std::printf("has positions %s\n", has_positions ? "true" : "false");
     std::printf("has velocities %s\n", has_velocities ? "true" : "false");
     std::printf("has forces %s\n", has_forces ? "true" : "false");
-    unitcell.DebugPrint();
+    if (has_dimensions){
+      unitcell.DebugPrint();
+    }
     if (has_positions) {
       print_3col("positions", positions);
     }
@@ -68,9 +74,12 @@ public:
 
 private:
   std::int64_t frame;
+  bool has_dimensions;
   bool has_positions;
   bool has_velocities;
   bool has_forces;
+
+  void set_dimensions_flag(bool val) { has_dimensions = val; }
 
   void set_positions_flag(bool val) { has_positions = val; }
 
@@ -83,6 +92,10 @@ private:
   void velocities_reserve() { velocities.reserve(3 * n_atoms); }
 
   void forces_reserve() { forces.reserve(3 * n_atoms); }
+
+  void set_dimensions(const std::vector<BoxT> &source) {
+    std::copy(source.begin(), source.end(), std::back_inserter(unitcell.box));
+  }
 
   // note full copy interface, can this take ownership of a smart pointer
   void set_positions(const std::vector<T> &source) {

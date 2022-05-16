@@ -42,34 +42,53 @@ cdef class TimestepContainer:
     cdef timestep_ptr_t _Timestep_ptr
     cdef dimensions_ptr_t _Dimensions_ptr
     cdef arr_type_t _dimtype
-    cdef arr_type_t _postype
+    cdef arr_type_t _pd_type
     cdef timestep_type_t _timestep_type
     cdef uint64_t n_atoms
 
 
-    def __cinit__(self, uint64_t n_atoms, cnp.ndarray box):
-        if box.dtype == np.float32:
-            self._Timestep_ptr.float_float_ptr = new Timestep[float, float](n_atoms, box)
-            self._dimtype = arr_type_t.FLOAT
-            self._timestep_type = timestep_type_t.FLOAT_FLOAT
-            self._Dimensions_ptr.float_ptr =  &dereference(self._Timestep_ptr.float_float_ptr).unitcell
+    def __cinit__(self, uint64_t n_atoms, position_dependent_dtype=np.float32, dimensions_dtype=np.float64):
+        if position_dependent_dtype == np.float32:
+            self.self._pd_type = arr_type_t.FLOAT
+            if  dimensions_dtype == np.float64: # most common is FLOAT_DOUBLE so put first
+                self._dimtype = arr_type_t.DOUBLE
+                self._Timestep_ptr.float_double_ptr = new Timestep[float, double](n_atoms, box)
+                self._timestep_type = timestep_type_t.FLOAT_DOUBLE
+                self._Dimensions_ptr.double_ptr =  &dereference(self._Timestep_ptr.float_double_ptr).unitcell
 
-        elif box.dtype == np.float64:
-            self._Timestep_ptr.float_double_ptr = new Timestep[float, double](n_atoms, box)
-            self._dimtype = arr_type_t.DOUBLE
-            self._timestep_type = timestep_type_t.FLOAT_DOUBLE
-            self._Dimensions_ptr.double_ptr =  &dereference(self._Timestep_ptr.float_double_ptr).unitcell
+            elif dimensions_dtype == np.float32:
+                self._dimtype = arr_type_t.FLOAT # FLOAT_FLOAT
+                self._Timestep_ptr.float_float_ptr = new Timestep[float, float](n_atoms, box)
+                self._timestep_type = timestep_type_t.FLOAT_FLOAT
+                self._Dimensions_ptr.float_ptr =  &dereference(self._Timestep_ptr.float_float_ptr).unitcell
+        
+        if position_dependent_dtype == np.float64:
+            self.self._pd_type = arr_type_t.DOUBLE
+            if  dimensions_dtype == np.float64:  # DOUBLE_DOUBLE
+                self._dimtype = arr_type_t.DOUBLE
+                self._Timestep_ptr.double_double_ptr = new Timestep[double, double](n_atoms, box)
+                self._timestep_type = timestep_type_t.DOBLE_DOUBLE
+                self._Dimensions_ptr.double_ptr =  &dereference(self._Timestep_ptr.double_double_ptr).unitcell
+
+            elif dimensions_dtype == np.float32:
+                self._dimtype = arr_type_t.FLOAT # DOUBLE_FLOAT
+                self._Timestep_ptr.double_float_ptr = new Timestep[double, float](n_atoms, box)
+                self._timestep_type = timestep_type_t.DOUBLE_FLOAT
+                self._Dimensions_ptr.float_ptr =  &dereference(self._Timestep_ptr.float_float_ptr).unitcell
+
         self.n_atoms =  n_atoms
     
     def __dealloc__(self):
         if self._timestep_type == FLOAT_FLOAT:
             del self._Timestep_ptr.float_float_ptr
-        if self._timestep_type == FLOAT_DOUBLE:
+        elif self._timestep_type == FLOAT_DOUBLE:
             del self._Timestep_ptr.float_double_ptr
-        if self._timestep_type == DOUBLE_FLOAT:
+        elif self._timestep_type == DOUBLE_FLOAT:
             del self._Timestep_ptr.double_float_ptr
-        if self._timestep_type == DOUBLE_DOUBLE:
+        elif self._timestep_type == DOUBLE_DOUBLE:
             del self._Timestep_ptr.double_double_ptr
+        else:
+            pass
 
 
     @property
@@ -86,7 +105,6 @@ cdef class TimestepContainer:
     @property
     def dimensions(self):
         cdef box_size = dereference(self._Dimensions_ptr.float_ptr).size
-        if 
         cdef float[::1] boxview = <float[:box_size]>dereference(self._Dimensions_ptr.float_ptr).box.data()
         cdef cnp.ndarray box_ndarr = np.asarray(boxview)
         return box_ndarr
