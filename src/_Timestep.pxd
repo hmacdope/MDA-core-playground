@@ -8,7 +8,6 @@ from _Dimensions cimport Dimensions
 
 cdef extern from "Timestep.h" namespace "mdacore":
     cdef cppclass Timestep[T,U]:
-        Timestep()
         # how do I pass through the T  of U through
         Timestep(const uint64_t n_atoms, const vector[U] &box)
         void SetPositions(const vector[T] &pos) 

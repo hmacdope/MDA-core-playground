@@ -21,8 +21,6 @@ public:
   std::vector<T> velocities;
   std::vector<T> forces;
 
-  // null constructable
-  Timestep() {}
 
   // Constructor
   Timestep(const std::uint64_t n_atoms,
