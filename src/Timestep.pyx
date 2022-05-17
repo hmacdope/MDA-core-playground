@@ -42,7 +42,7 @@ cdef class TimestepContainer:
     cdef timestep_type_t _timestep_type
     cdef uint64_t n_atoms
 
-    cdef bool has_positons
+    cdef bool has_positions
     cdef cnp.ndarray positions
     cdef cnp.float32_t[:,::1] _posview_f
     cdef cnp.float64_t[:,::1] _posview_d
@@ -82,6 +82,22 @@ cdef class TimestepContainer:
         else:
             pass
 
+    @property
+    def has_positions(self):
+        if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
+            self.has_positions = dereference(self._Timestep_ptr.float_ptr).has_positions
+        elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
+            self.has_positions = dereference(self._Timestep_ptr.double_ptr).has_positions
+        return self.has_positions
+
+    @property
+    def has_dimensions(self):
+        if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
+            self.has_dimensions = dereference(self._Timestep_ptr.float_ptr).has_dimensions
+        elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
+            self.has_dimensions = dereference(self._Timestep_ptr.double_ptr).has_dimensions
+        return self.has_dimensions
+
 
     @property
     def positions(self):
@@ -104,8 +120,12 @@ cdef class TimestepContainer:
         # size checks
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
             dereference(self._Timestep_ptr.float_ptr).SetPositions(new_positions.flatten())
+            self.has_positions = dereference(self._Timestep_ptr.float_ptr).has_positions
+
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
             dereference(self._Timestep_ptr.double_ptr).SetPositions(new_positions.flatten())
+            self.has_positions = dereference(self._Timestep_ptr.double_ptr).has_positions
+
 
 
 
@@ -127,13 +147,20 @@ cdef class TimestepContainer:
 
     
     @dimensions.setter
-    def dimensions(self, cnp.ndarray[cnp.float32_t, ndim=2] newbox):
-        if newbox.ndim  >= 2:
+    def dimensions(self, cnp.ndarray new_dimensions):
+        if new_dimensions.ndim  >= 2:
             raise ValueError("box cannot be set with multidimensional array")
-        cdef size_t first_dim =  newbox.shape[0]
-        if first_dim > dereference(self._Dimensions_ptr.float_ptr).max_size:
-            raise ValueError("box cannot be set with first dimension shape {}".format(first_dim))
-        dereference(self._Dimensions_ptr.float_ptr).box = newbox.flatten()
+        cdef size_t first_dim =  new_dimensions.shape[0]
+        if (first_dim != 9) and (first_dim != 6):
+            raise ValueError("box cannot be set with first dimension shape {}, must be one of (6, 9)".format(first_dim))
+        if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
+            dereference(self._Timestep_ptr.float_ptr).SetDimensions(new_dimensions.flatten())
+            self.has_dimensions = dereference(self._Timestep_ptr.float_ptr).has_positions
+        elif self._timestep_type == timestep_type_t.DOUBLE_DOUBLE:
+            dereference(self._Timestep_ptr.double_ptr).SetDimensions(new_dimensions.flatten())
+            self.has_dimensions = dereference(self._Timestep_ptr.double_ptr).has_positions
+
+
 
 
 
