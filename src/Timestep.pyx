@@ -53,6 +53,16 @@ cdef class TimestepContainer:
     cdef cnp.float32_t[::1] _boxview_f
     cdef cnp.float64_t[::1] _boxview_d
 
+    cdef bool has_velocities
+    cdef cnp.ndarray velocities
+    cdef cnp.float32_t[:,::1] _velview_f
+    cdef cnp.float64_t[:,::1] _velview_d
+
+    cdef bool has_forces
+    cdef cnp.ndarray forces
+    cdef cnp.float32_t[:,::1] _frcview_f
+    cdef cnp.float64_t[:,::1] _frcview_d
+
     def __cinit__(self, uint64_t n_atoms, dtype=np.float32):
 
         if dtype == np.float32:
@@ -102,7 +112,8 @@ cdef class TimestepContainer:
     @property
     def positions(self):
         if self.has_positions:
-            # we use memoryview -> ndarray with no copy
+            # we use memoryview -> ndarray with no copy, asarray manages the memory from the python side
+            #is PyArray_SimpleNewFromData faster? 
             if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
                 self._posview_f = <cnp.float32_t[:self.n_atoms, :3]>dereference(self._Timestep_ptr.float_ptr).positions.data()
                 self.positions =  np.asarray(self._posview_f)
@@ -110,7 +121,7 @@ cdef class TimestepContainer:
                 self._posview_d = <cnp.float64_t[:self.n_atoms, :3]>dereference(self._Timestep_ptr.double_ptr).positions.data()
                 self.positions =  np.asarray(self._posview_d)
         else:
-            self.positions = None
+            raise ValueError("This Timestep has no position information")
 
         return self.positions
 
@@ -120,12 +131,13 @@ cdef class TimestepContainer:
         # size checks
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
             dereference(self._Timestep_ptr.float_ptr).SetPositions(new_positions.flatten())
-            self.has_positions = dereference(self._Timestep_ptr.float_ptr).has_positions
+            dereference(self._Timestep_ptr.float_ptr).has_positions = True
+            self.has_dimensions = True
 
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
             dereference(self._Timestep_ptr.double_ptr).SetPositions(new_positions.flatten())
-            self.has_positions = dereference(self._Timestep_ptr.double_ptr).has_positions
-
+            dereference(self._Timestep_ptr.double_ptr).has_positions = True
+            self.has_dimensions = True
 
 
 
@@ -141,7 +153,7 @@ cdef class TimestepContainer:
                 self._boxview_d = <cnp.float64_t[:self._box_size]>dereference(self._Dimensions_ptr.double_ptr).box.data()
                 self.dimensions = np.asarray(self._boxview_d)
         else:
-            self.positions = None
+            raise ValueError("This Timestep has no dimension information")
 
         return self.dimensions
 
@@ -155,10 +167,12 @@ cdef class TimestepContainer:
             raise ValueError("box cannot be set with first dimension shape {}, must be one of (6, 9)".format(first_dim))
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
             dereference(self._Timestep_ptr.float_ptr).SetDimensions(new_dimensions.flatten())
-            self.has_dimensions = dereference(self._Timestep_ptr.float_ptr).has_positions
+            dereference(self._Timestep_ptr.float_ptr).has_dimensions = True
+            self.has_dimensions = True
         elif self._timestep_type == timestep_type_t.DOUBLE_DOUBLE:
             dereference(self._Timestep_ptr.double_ptr).SetDimensions(new_dimensions.flatten())
-            self.has_dimensions = dereference(self._Timestep_ptr.double_ptr).has_positions
+            dereference(self._Timestep_ptr.double_ptr).has_dimensions = True
+            self.has_dimensions = True
 
 
 
