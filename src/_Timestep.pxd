@@ -2,6 +2,7 @@
 
 from libcpp.vector cimport vector
 from libc.stdint cimport uint64_t
+from libcpp cimport bool
 
 from _Dimensions cimport Dimensions
 
@@ -21,4 +22,11 @@ cdef extern from "Timestep.h" namespace "mdacore":
         vector[T] positions
         vector[T] velocities
         vector[T] forces
+
+        bool has_dimensions
+        bool has_positions
+        bool has_velocities
+        bool has_forces
+
+
 

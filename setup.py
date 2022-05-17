@@ -16,7 +16,7 @@ def extensions():
             extra_compile_args=["-std=c++11"],
             extra_link_args=["-std=c++11"],
         ))
-    return cythonize(exts, gdb_debug=False)
+    return cythonize(exts, gdb_debug=False, annotate=True)
 
 
 setup(

@@ -21,10 +21,15 @@ public:
   std::vector<T> velocities;
   std::vector<T> forces;
 
+  bool has_dimensions;
+  bool has_positions;
+  bool has_velocities;
+  bool has_forces;
+
   // Constructor
   explicit Timestep(const std::uint64_t n_atoms)
-      : n_atoms(n_atoms), unitcell(), frame(-1), has_dimensions(false),
-        has_positions(false), has_velocities(false), has_forces(false) {}
+      : n_atoms(n_atoms), unitcell(), has_dimensions(false),
+        has_positions(false), has_velocities(false), has_forces(false), frame(-1) {}
 
   // copy constructor
 
@@ -74,10 +79,7 @@ public:
 
 private:
   std::int64_t frame;
-  bool has_dimensions;
-  bool has_positions;
-  bool has_velocities;
-  bool has_forces;
+
 
   void set_dimensions_flag(bool val) { has_dimensions = val; }
 
