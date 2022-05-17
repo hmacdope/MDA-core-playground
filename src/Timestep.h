@@ -96,7 +96,7 @@ private:
   void forces_reserve() { forces.reserve(3 * n_atoms); }
 
   void set_dimensions(const std::vector<BoxT> &source) {
-    std::copy(source.begin(), source.end(), std::back_inserter(unitcell.box));
+    unitcell.SetBox(source);
   }
 
   // note full copy interface, can this take ownership of a smart pointer

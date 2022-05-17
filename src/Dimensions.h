@@ -21,13 +21,16 @@ public:
   Dimensions() { box.reserve(max_size); }
 
   explicit Dimensions(const std::vector<T> &source) {
-    if (source.size() > max_size) {
-      throw std::runtime_error("Input too large to be triclinic or orthogonal box");
-    }
     box.reserve(max_size);
     std::copy(source.begin(), source.end(), std::back_inserter(box));
     size = box.size();
   }
+
+  void SetBox(const std::vector<T> &source) {
+    std::copy(source.begin(), source.end(), std::back_inserter(box));
+    size = box.size();
+  }
+
   // Dump state
   void DebugPrint() { print_3col("Dimensions", box); }
 };
