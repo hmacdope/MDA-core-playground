@@ -30,37 +30,28 @@ ctypedef union timestep_ptr_t:
     Timestep[float, float] *float_ptr
     Timestep[double, double] *double_ptr
 
-ctypedef union dimensions_ptr_t:
-    void *null_ptr
-    Dimensions[float] *float_ptr
-    Dimensions[double] *double_ptr
-
-
 
 cdef class TimestepContainer:
+    # pointer to timestep instance
     cdef timestep_ptr_t _Timestep_ptr
-    cdef dimensions_ptr_t _Dimensions_ptr
     cdef timestep_type_t _timestep_type
     
     # shape of particle dependent data for numpy
     cdef cnp.npy_intp _particle_dependent_shape[2]
+    # shape of box for numpy
     cdef cnp.npy_intp _box_shape[1]
 
 
     cdef uint64_t n_atoms
 
-    cdef bool has_dimensions
-    cdef cnp.ndarray dimensions
+    cdef bool _has_dimensions
     cdef size_t    _box_size
 
-    cdef bool has_positions
-    cdef cnp.ndarray positions
+    cdef bool _has_positions
 
-    cdef bool has_velocities
-    cdef cnp.ndarray velocities
+    cdef bool _has_velocities
 
-    cdef bool has_forces
-    cdef cnp.ndarray forces
+    cdef bool _has_forces
 
 
     def __cinit__(self, uint64_t n_atoms, dtype=np.float32):
@@ -68,16 +59,14 @@ cdef class TimestepContainer:
         if dtype == np.float32:
             self._timestep_type = timestep_type_t.FLOAT_FLOAT
             self._Timestep_ptr.float_ptr = new Timestep[float, float](n_atoms)
-            self._Dimensions_ptr.float_ptr =  &dereference(self._Timestep_ptr.float_ptr).unitcell
-            self.has_positions = dereference(self._Timestep_ptr.float_ptr).has_positions
-            self.has_dimensions = dereference(self._Timestep_ptr.float_ptr).has_dimensions
+            self._has_positions = dereference(self._Timestep_ptr.float_ptr).has_positions
+            self._has_dimensions = dereference(self._Timestep_ptr.float_ptr).has_dimensions
         
         elif dtype == np.float64:
             self._timestep_type = timestep_type_t.DOUBLE_DOUBLE
             self._Timestep_ptr.double_ptr = new Timestep[double, double](n_atoms)
-            self._Dimensions_ptr.double_ptr =  &dereference(self._Timestep_ptr.double_ptr).unitcell
-            self.has_positions = dereference(self._Timestep_ptr.double_ptr).has_positions
-            self.has_dimensions = dereference(self._Timestep_ptr.double_ptr).has_dimensions
+            self._has_positions = dereference(self._Timestep_ptr.double_ptr).has_positions
+            self._has_dimensions = dereference(self._Timestep_ptr.double_ptr).has_dimensions
 
         else:
             raise TypeError("dtype not supported, must be one of (np.float32, np.float64)")
@@ -85,6 +74,7 @@ cdef class TimestepContainer:
         self.n_atoms =  n_atoms
         self._particle_dependent_shape[0] = self.n_atoms
         self._particle_dependent_shape[1] = 3
+        self._box_shape[0] = 0
 
 
     
@@ -105,31 +95,31 @@ cdef class TimestepContainer:
     @property
     def has_positions(self):
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-            self.has_positions = dereference(self._Timestep_ptr.float_ptr).has_positions
+            self._has_positions = dereference(self._Timestep_ptr.float_ptr).has_positions
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-            self.has_positions = dereference(self._Timestep_ptr.double_ptr).has_positions
-        return self.has_positions
+            self._has_positions = dereference(self._Timestep_ptr.double_ptr).has_positions
+        return self._has_positions
 
     @property
     def has_dimensions(self):
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-            self.has_dimensions = dereference(self._Timestep_ptr.float_ptr).has_dimensions
+            self._has_dimensions = dereference(self._Timestep_ptr.float_ptr).has_dimensions
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-            self.has_dimensions = dereference(self._Timestep_ptr.double_ptr).has_dimensions
-        return self.has_dimensions
+            self._has_dimensions = dereference(self._Timestep_ptr.double_ptr).has_dimensions
+        return self._has_dimensions
 
 
     @property
     def positions(self):
-        if self.has_positions:
+        if self._has_positions:
             if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-                self.positions =  self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_FLOAT,dereference(self._Timestep_ptr.float_ptr).positions.data())
+                arr = self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_FLOAT,dereference(self._Timestep_ptr.float_ptr).positions.data())
             elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-                self.positions =  self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_DOUBLE,dereference(self._Timestep_ptr.double_ptr).positions.data())
+                arr =  self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_DOUBLE,dereference(self._Timestep_ptr.double_ptr).positions.data())
         else:
             raise ValueError("This Timestep has no position information")
 
-        return self.positions
+        return arr
 
  
     @positions.setter
@@ -137,31 +127,29 @@ cdef class TimestepContainer:
         # size checks
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
             dereference(self._Timestep_ptr.float_ptr).SetPositions(new_positions.flatten())
-            dereference(self._Timestep_ptr.float_ptr).has_positions = True
-            self.has_dimensions = True
+            self._has_dimensions = True
 
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
             dereference(self._Timestep_ptr.double_ptr).SetPositions(new_positions.flatten())
-            dereference(self._Timestep_ptr.double_ptr).has_positions = True
-            self.has_dimensions = True
+            self._has_dimensions = True
 
 
 
     @property
     def dimensions(self):
-        if self.has_dimensions:
+        if self._has_dimensions:
             if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-                self._box_size = dereference(self._Dimensions_ptr.float_ptr).size
+                self._box_size = dereference(self._Timestep_ptr.float_ptr).unitcell.size
                 self._box_shape[0] = self._box_size
-                self.dimensions = self._to_numpy_from_spec(1, self._box_shape, cnp.NPY_FLOAT,dereference(self._Dimensions_ptr.float_ptr).box.data())
+                arr = self._to_numpy_from_spec(1, self._box_shape, cnp.NPY_FLOAT,dereference(self._Timestep_ptr.float_ptr).unitcell.box.data())
             elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-                self._box_size = dereference(self._Dimensions_ptr.double_ptr).size
+                self._box_size = dereference(self._Timestep_ptr.double_ptr).unitcell.size
                 self._box_shape[0] = self._box_size
-                self.dimensions = self._to_numpy_from_spec(1,self._box_shape, cnp.NPY_DOUBLE,dereference(self._Dimensions_ptr.double_ptr).box.data())
+                arr = self._to_numpy_from_spec(1,self._box_shape, cnp.NPY_DOUBLE,dereference(self._Timestep_ptr.double_ptr).unitcell.box.data())
         else:
             raise ValueError("This Timestep has no dimension information")
 
-        return self.dimensions
+        return arr
 
     
     @dimensions.setter
@@ -174,11 +162,11 @@ cdef class TimestepContainer:
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
             dereference(self._Timestep_ptr.float_ptr).SetDimensions(new_dimensions.flatten())
             self._box_size = dereference(self._Timestep_ptr.float_ptr).unitcell.size
-            self.has_dimensions = True
+            self._has_dimensions = True
         elif self._timestep_type == timestep_type_t.DOUBLE_DOUBLE:
             dereference(self._Timestep_ptr.double_ptr).SetDimensions(new_dimensions.flatten())
             self._box_size = dereference(self._Timestep_ptr.double_ptr).unitcell.size
-            self.has_dimensions = True
+            self._has_dimensions = True
 
 
 
