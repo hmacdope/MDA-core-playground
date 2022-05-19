@@ -1,11 +1,11 @@
 # distutils: language = c++
-#cython: language_level=3
+# cython: language_level=3
 
 from _Timestep cimport Timestep
 from _Dimensions cimport Dimensions
+from _external_func cimport _mul_two
 
-from cython cimport  floating
-from cython.operator cimport dereference
+cimport cython
 from libcpp.vector cimport vector
 from libc.stdint cimport uint64_t
 from libcpp cimport bool
@@ -228,3 +228,7 @@ cdef class TimestepContainer:
             self._Timestep_ptr.double_ptr.SetForces(new_forces.flatten())
             self._has_forces = True
 
+      
+
+def double(cython.floating[:] input, cython.floating[:] output, size):
+    _mul_two(&input[0], &output[0], size)
