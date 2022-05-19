@@ -142,11 +142,11 @@ cdef class TimestepContainer:
         # size checks
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
             self._Timestep_ptr.float_ptr.SetPositions(new_positions.flatten())
-            self._has_dimensions = True
+            self._has_positions = True
 
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
             self._Timestep_ptr.double_ptr.SetPositions(new_positions.flatten())
-            self._has_dimensions = True
+            self._has_positions = True
 
 
 

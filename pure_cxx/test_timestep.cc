@@ -24,5 +24,11 @@ int main() {
   tstep_ortho_f.SetForces(position_dependent);
   tstep_ortho_f.DebugPrint();
 
+  tstep_ortho_f.SetDimensions(f_boxmat);
+  tstep_ortho_f.SetDimensions(f_boxmat);
+  tstep_ortho_f.SetPositions(position_dependent);
+  tstep_ortho_f.DebugPrint();
+
+
 
 }
