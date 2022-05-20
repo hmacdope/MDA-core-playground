@@ -84,6 +84,13 @@ cdef class TimestepContainer:
             del self._Timestep_ptr.double_ptr
         else:
             pass
+
+    @property
+    def dtype(self):
+        if self._timestep_type == FLOAT_FLOAT:
+            return np.float32
+        elif self._timestep_type == DOUBLE_DOUBLE:
+            return np.float64 
     
     cdef inline _to_numpy_from_spec(self, int ndim, cnp.npy_intp* shape, int npy_type, void* pointer):
         array = cnp.PyArray_SimpleNewFromData(ndim, shape, npy_type, pointer)
@@ -227,8 +234,10 @@ cdef class TimestepContainer:
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
             self._Timestep_ptr.double_ptr.SetForces(new_forces.flatten())
             self._has_forces = True
+    
+    
 
-      
-
-def double(cython.floating[:] input, cython.floating[:] output, size):
-    _mul_two(&input[0], &output[0], size)
+@cython.boundscheck(False)  
+@cython.wraparound(False)
+def modify_values(cython.floating[:,::1] input not None, cython.floating[:,::1] output not None):
+    _mul_two(&input[0,0], &output[0,0], input.shape[0]*input.shape[1])
