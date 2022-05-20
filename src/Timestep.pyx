@@ -34,6 +34,7 @@ ctypedef union timestep_ptr_t:
 cdef class TimestepContainer:
     # pointer to timestep instance
     cdef timestep_ptr_t _Timestep_ptr
+    # enum with  the timestep type
     cdef timestep_type_t _timestep_type
     
     # shape of particle dependent data for numpy
@@ -145,6 +146,8 @@ cdef class TimestepContainer:
 
  
     @positions.setter
+    @cython.boundscheck(False)  
+    @cython.wraparound(False)
     def positions(self,  cnp.ndarray new_positions):
         # size checks
         cdef float[:,:] f_view
@@ -177,6 +180,8 @@ cdef class TimestepContainer:
 
     
     @dimensions.setter
+    @cython.boundscheck(False)  
+    @cython.wraparound(False)
     def dimensions(self, cnp.ndarray new_dimensions):
         if new_dimensions.ndim  >= 2:
             raise ValueError("box cannot be set with multidimensional array")
@@ -204,6 +209,8 @@ cdef class TimestepContainer:
 
  
     @velocities.setter
+    @cython.boundscheck(False)  
+    @cython.wraparound(False)
     def velocities(self,  cnp.ndarray new_velocities):
         # size checks
         cdef float[:,:] f_view

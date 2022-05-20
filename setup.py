@@ -13,7 +13,7 @@ def extensions():
             sources= ["./src/Timestep.pyx"],
             include_dirs=[ "./src/", np.get_include()],
             language="c++",
-            extra_compile_args=["-std=c++11"],
+            extra_compile_args=["-std=c++11","-O3"],
             extra_link_args=["-std=c++11"],
         ))
     return cythonize(exts, gdb_debug=False, annotate=True)
