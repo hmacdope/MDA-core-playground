@@ -38,19 +38,19 @@ public:
     set_dimensions_flag(true);
   }
 
-  void SetPositions(const std::vector<T> &pos) {
+  void SetPositions(const T* pos) {
     positions_reserve();
     set_positions(pos);
     set_positions_flag(true);
   }
 
-  void SetVelocities(const std::vector<T> &vel) {
+  void SetVelocities(const T* vel) {
     velocities_reserve();
     set_velocities(vel);
     set_velocities_flag(true);
   }
 
-  void SetForces(const std::vector<T> &frc) {
+  void SetForces(const T* frc) {
     forces_reserve();
     set_forces(frc);
     set_forces_flag(true);
@@ -100,20 +100,26 @@ private:
   }
 
   // note full copy interface, can this take ownership of a smart pointer
-  void set_positions(const std::vector<T> &source) {
+  void set_positions(const T* source) {
     // should we specify the number of elements in this and below rather than
     //  relying on vector of correct size
-    positions = source;
+    const T* end = source+3*n_atoms;
+    std::vector<T> tmp {source, end };
+    positions = tmp;
   }
 
   // note full copy interface, can this take ownership of a smart pointer
-  void set_velocities(const std::vector<T> &source) {
-    velocities = source;
+  void set_velocities(const T *source) {
+    const T* end = source+3*n_atoms;
+    std::vector<T> tmp {source, end };
+    velocities = tmp;
   }
 
   // note full copy interface, can this take ownership of a smart pointer
-  void set_forces(const std::vector<T> &source) {
-    forces = source;
+  void set_forces(const T* source) {
+    const T* end = source+3*n_atoms;
+    std::vector<T> tmp {source, end };
+    forces = tmp;  
   }
 };
 

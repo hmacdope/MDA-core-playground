@@ -147,12 +147,16 @@ cdef class TimestepContainer:
     @positions.setter
     def positions(self,  cnp.ndarray new_positions):
         # size checks
+        cdef float[:,:] f_view
+        cdef double[:,:] d_view
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-            self._Timestep_ptr.float_ptr.SetPositions(new_positions.flatten())
+            f_view = new_positions
+            self._Timestep_ptr.float_ptr.SetPositions(&f_view[0,0])
             self._has_positions = True
 
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-            self._Timestep_ptr.double_ptr.SetPositions(new_positions.flatten())
+            d_view = new_positions
+            self._Timestep_ptr.double_ptr.SetPositions(&d_view[0,0])
             self._has_positions = True
 
 
@@ -202,12 +206,16 @@ cdef class TimestepContainer:
     @velocities.setter
     def velocities(self,  cnp.ndarray new_velocities):
         # size checks
+        cdef float[:,:] f_view
+        cdef double[:,:] d_view
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-            self._Timestep_ptr.float_ptr.SetVelocities(new_velocities.flatten())
+            f_view = new_velocities
+            self._Timestep_ptr.float_ptr.SetVelocities(&f_view[0,0])
             self._has_velocities = True
 
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-            self._Timestep_ptr.double_ptr.SetVelocities(new_velocities.flatten())
+            d_view = new_velocities
+            self._Timestep_ptr.double_ptr.SetVelocities(&d_view[0,0])
             self._has_velocities = True
 
 
@@ -225,14 +233,20 @@ cdef class TimestepContainer:
 
  
     @forces.setter
+    @cython.boundscheck(False)  
+    @cython.wraparound(False)
     def forces(self,  cnp.ndarray new_forces):
         # size checks
+        cdef float[:,:] f_view
+        cdef double[:,:] d_view
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-            self._Timestep_ptr.float_ptr.SetForces(new_forces.flatten())
+            f_view = new_forces
+            self._Timestep_ptr.float_ptr.SetForces(&f_view[0,0])
             self._has_forces = True
 
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-            self._Timestep_ptr.double_ptr.SetForces(new_forces.flatten())
+            d_view = new_forces
+            self._Timestep_ptr.double_ptr.SetForces(&d_view[0,0])
             self._has_forces = True
     
     
