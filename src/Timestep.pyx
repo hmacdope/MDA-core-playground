@@ -153,13 +153,13 @@ cdef class TimestepContainer:
         cdef float[:,:] f_view
         cdef double[:,:] d_view
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-            f_view = new_positions
-            self._Timestep_ptr.float_ptr.SetPositions(&f_view[0,0])
+            cnp.Py_INCREF(new_positions)
+            self._Timestep_ptr.float_ptr.SetPositions(<float*>new_positions.data)
             self._has_positions = True
 
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-            d_view = new_positions
-            self._Timestep_ptr.double_ptr.SetPositions(&d_view[0,0])
+            cnp.Py_INCREF(new_positions)
+            self._Timestep_ptr.double_ptr.SetPositions(<double*>new_positions.data)
             self._has_positions = True
 
 
