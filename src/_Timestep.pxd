@@ -12,17 +12,17 @@ cdef extern from "Timestep.h" namespace "mdacore":
         # how do I pass through the T  of U through
         Timestep(const uint64_t n_atoms)
         void SetDimensions(const vector[U] &pos) 
-        void SetPositions(const T* &pos) 
-        void SetVelocities(const T* &vel)
-        void SetForces(const T* &frc)
+        void SetPositions(const T* pos) 
+        void SetVelocities(const T* vel)
+        void SetForces( T* frc)
 
         Dimensions[U] unitcell
 
         uint64_t n_atoms
 
-        vector[T] positions
-        vector[T] velocities
-        vector[T] forces
+        T* positions
+        T* velocities
+        T* forces
 
         bool has_dimensions
         bool has_positions

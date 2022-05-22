@@ -136,9 +136,9 @@ cdef class TimestepContainer:
     def positions(self):
         if self._has_positions:
             if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-                arr = self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_FLOAT,self._Timestep_ptr.float_ptr.positions.data())
+                arr = self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_FLOAT,self._Timestep_ptr.float_ptr.positions)
             elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-                arr =  self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_DOUBLE,self._Timestep_ptr.double_ptr.positions.data())
+                arr =  self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_DOUBLE,self._Timestep_ptr.double_ptr.positions)
         else:
             raise ValueError("This Timestep has no position information")
 
@@ -199,9 +199,9 @@ cdef class TimestepContainer:
     def velocities(self):
         if self._has_velocities:
             if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-                arr = self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_FLOAT,self._Timestep_ptr.float_ptr.velocities.data())
+                arr = self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_FLOAT,self._Timestep_ptr.float_ptr.velocities)
             elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-                arr =  self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_DOUBLE,self._Timestep_ptr.double_ptr.velocities.data())
+                arr =  self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_DOUBLE,self._Timestep_ptr.double_ptr.velocities)
         else:
             raise ValueError("This Timestep has no velocities information")
 
@@ -230,9 +230,9 @@ cdef class TimestepContainer:
     def forces(self):
         if self._has_forces:
             if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-                arr = self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_FLOAT,self._Timestep_ptr.float_ptr.forces.data())
+                arr = self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_FLOAT,self._Timestep_ptr.float_ptr.forces)
             elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-                arr =  self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_DOUBLE,self._Timestep_ptr.double_ptr.forces.data())
+                arr =  self._to_numpy_from_spec(2,self._particle_dependent_shape,cnp.NPY_DOUBLE,self._Timestep_ptr.double_ptr.forces)
         else:
             raise ValueError("This Timestep has no force information")
 
