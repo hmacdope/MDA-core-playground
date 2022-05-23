@@ -143,25 +143,20 @@ cdef class TimestepContainer:
             raise ValueError("This Timestep has no position information")
 
         return arr
-
  
     @positions.setter
     @cython.boundscheck(False)  
     @cython.wraparound(False)
     def positions(self,  cnp.ndarray new_positions):
-        # size checks
-        cdef float[:,:] f_view
-        cdef double[:,:] d_view
+        # INCREF as we are now dependent on the memory from new_positions so it cannot be realloced
+        # NOTE HOW IS THIS CLEANED UP, are we creating a massive memory chain?
+        cnp.Py_INCREF(new_positions)
+        # sync pointers with C++ datastruture
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-            cnp.Py_INCREF(new_positions)
-            self._Timestep_ptr.float_ptr.SetPositions(<float*>new_positions.data)
-            self._has_positions = True
-
+            self._Timestep_ptr.float_ptr.SetPositions(<float*> cnp.PyArray_DATA(new_positions))
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-            cnp.Py_INCREF(new_positions)
-            self._Timestep_ptr.double_ptr.SetPositions(<double*>new_positions.data)
-            self._has_positions = True
-
+            self._Timestep_ptr.double_ptr.SetPositions(<double*> cnp.PyArray_DATA(new_positions))
+        self._has_positions = True
 
 
     @property
@@ -213,17 +208,17 @@ cdef class TimestepContainer:
     @cython.wraparound(False)
     def velocities(self,  cnp.ndarray new_velocities):
         # size checks
-        cdef float[:,:] f_view
-        cdef double[:,:] d_view
+        # INCREF as we are now dependent on the memory from new_positions so it cannot be realloced
+        # NOTE HOW IS THIS CLEANED UP, are we creating a massive memory chain?
+        cnp.Py_INCREF(new_velocities)
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-            f_view = new_velocities
-            self._Timestep_ptr.float_ptr.SetVelocities(&f_view[0,0])
-            self._has_velocities = True
+            self._Timestep_ptr.float_ptr.SetVelocities(<float*> cnp.PyArray_DATA(new_velocities))
 
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
             d_view = new_velocities
-            self._Timestep_ptr.double_ptr.SetVelocities(&d_view[0,0])
-            self._has_velocities = True
+            self._Timestep_ptr.double_ptr.SetVelocities(<double*> cnp.PyArray_DATA(new_velocities))
+
+        self._has_velocities = True
 
 
     @property
@@ -244,21 +239,15 @@ cdef class TimestepContainer:
     @cython.wraparound(False)
     def forces(self,  cnp.ndarray new_forces):
         # size checks
-        cdef float[:,:] f_view
-        cdef double[:,:] d_view
+        # INCREF as we are now dependent on the memory from new_positions so it cannot be realloced
+        # NOTE HOW IS THIS CLEANED UP, are we creating a massive memory chain?
+        cnp.Py_INCREF(new_forces)
         if self._timestep_type  ==  timestep_type_t.FLOAT_FLOAT:
-            f_view = new_forces
-            self._Timestep_ptr.float_ptr.SetForces(&f_view[0,0])
-            self._has_forces = True
-
+            self._Timestep_ptr.float_ptr.SetForces(<float*> cnp.PyArray_DATA(new_forces))
         elif self._timestep_type  ==  timestep_type_t.DOUBLE_DOUBLE:
-            d_view = new_forces
-            self._Timestep_ptr.double_ptr.SetForces(&d_view[0,0])
-            self._has_forces = True
-    
-    
+            self._Timestep_ptr.double_ptr.SetForces(<double*> cnp.PyArray_DATA(new_forces))
 
-@cython.boundscheck(False)  
-@cython.wraparound(False)
-def modify_values(cython.floating[:,::1] input not None, cython.floating[:,::1] output not None):
-    _mul_two(&input[0,0], &output[0,0], input.shape[0]*input.shape[1])
+        self._has_forces = True
+    
+  
+

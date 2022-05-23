@@ -31,7 +31,7 @@ namespace mdacore
 
     // Constructor
     explicit Timestep(const std::uint64_t n_atoms)
-        : n_atoms(n_atoms), unitcell(), has_dimensions(false),
+        : n_atoms(n_atoms), unitcell(), positions(nullptr), velocities(nullptr), forces(nullptr), has_dimensions(false),
           has_positions(false), has_velocities(false), has_forces(false), frame(-1) {}
 
     // copy constructor
